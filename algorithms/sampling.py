@@ -15,8 +15,13 @@ def prior_sample(network, rng: random.Random) -> dict:
     - network.variables ya está en orden topológico. Consulte la CPT con
       network.probability(variable, 1, event), usando el evento parcial.
     """
-    # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
+    # TODO:
+    sample = {}
+    for variable in network.variables:
+        p_true = network.probability(variable, 1, sample)
+        sample[variable] = 1 if rng.random() < p_true else 0
+    return sample
+    
     # FIN DEL BLOQUE DEL ESTUDIANTE
 
 
@@ -41,6 +46,16 @@ def sampling_ask(network, query, evidence, samples, rng, reject=False):
         raise ValueError("El número de muestras debe ser positivo")
     if evidence and not reject:
         raise ValueError("Muestreo a priori estima marginales; use rechazo con evidencia")
-    # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
+    # TODO: 
+    counts = {0: 0, 1: 0}
+    accepted = 0
+    for _ in range(samples):
+        sample = prior_sample(network, rng)
+        if reject and any(sample[var] != val for var, val in evidence.items()):
+            continue
+        counts[sample[query]] += 1
+        accepted += 1
+    if accepted == 0:
+        return None, 0
+    return normalize(counts), accepted
     # FIN DEL BLOQUE DEL ESTUDIANTE

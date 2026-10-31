@@ -24,8 +24,10 @@ def action_value(mdp, state, action, values):
     - No vuelva a sumar la recompensa del terminal en su valor:
       values[terminal] es cero.
     """
-    # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
+    # TODO: 
+    return sum(probability * (mdp.reward(state, action, successor)
+                              + mdp.discount * values[successor])
+               for successor, probability in mdp.transitions(state, action))
     # FIN DEL BLOQUE DEL ESTUDIANTE
 
 
@@ -53,8 +55,18 @@ def value_iteration(mdp, tolerance=1e-8, max_iterations=1000):
     values = dict.fromkeys(mdp.states, 0.0)
     history, deltas = [values.copy()], []
     for _ in range(max_iterations):
-        # TODO: Add your code here
-        raise NotImplementedError("Complete este bloque TODO")
+        # TODO: 
+        new_values = {}
+        for state in mdp.states:
+            actions = mdp.actions(state)
+            if not actions:
+                new_values[state] = 0.0
+            else:
+                new_values[state] = max(action_value(mdp, state, a, values)
+                                        for a in actions)
+        delta = max(abs(new_values[s] - values[s]) for s in mdp.states)
+        values = new_values
+        converged = delta < tolerance
         # FIN DEL BLOQUE DEL ESTUDIANTE
         # Copias para la animación y empaquetado del resultado.
         history.append(values.copy())
@@ -62,6 +74,7 @@ def value_iteration(mdp, tolerance=1e-8, max_iterations=1000):
         if converged:
             return PlanningResult(values, history, deltas, True)
     return PlanningResult(values, history, deltas, False)
+    
 
 
 def extract_policy(mdp, values):
